@@ -709,6 +709,7 @@ BOOL CALLBACK CfgDlgOptPanProc(HWND hWndDlg, UINT wMessage, WPARAM wParam, LPARA
 			return TRUE;
 		case EmuCoreRadio1:
 		case EmuCoreRadio2:
+		case EmuCoreRadio3:
 		{
 			CHIP_OPTS* TempCOpts;
 			
@@ -718,9 +719,13 @@ BOOL CALLBACK CfgDlgOptPanProc(HWND hWndDlg, UINT wMessage, WPARAM wParam, LPARA
 			{
 				TempCOpts->EmuCore = 0x00;
 			}
-			else //if (LOWORD(wParam) == EmuCoreRadio2)
+			else if (LOWORD(wParam) == EmuCoreRadio2)
 			{
 				TempCOpts->EmuCore = 0x01;
+			}
+			else // if (LOWORD(wParam) == EmuCoreRadio3)
+			{
+				TempCOpts->EmuCore = 0x02;
 			}
 			RefreshPlaybackOptions();
 			ShowOptPanBoxes(MuteChipID, MuteChipSet);
@@ -1151,7 +1156,8 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 	UINT8 ChnCount;
 	UINT8 CurChn;
 	const char* SpcName[0x20];	// Special Channel Names
-	const char* CoreName[0x02];	// Names for the Emulation Cores
+	const char* CoreName[0x03];	// Names for the Emulation Cores
+	UINT8 MaxMultiCore = 2;
 	bool EnableChk;
 	bool MultiCore;
 	bool CanPan;
@@ -1164,7 +1170,8 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 		SpcName[CurChn] = NULL;
 	
 	CoreName[0x00] = "MAME";
-	CoreName[0x01] = NULL;
+	CoreName[0x01] = "Alternative";
+	CoreName[0x02] = "Alternative";
 	
 	// ChipOpts[0x01] contains the EmuCore that's currently used
 	TempCOpts = (CHIP_OPTS*)&ChipOpts[0x01] + ChipID;
@@ -1184,8 +1191,10 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 		break;
 	case 0x01:	// YM2413
 		MultiCore = true;
-		CoreName[0x00] = "EMU2413";
+		MaxMultiCore = 3;
+		CoreName[0x00] = "EMU2413 (v1.2.x)";
 		CoreName[0x01] = "MAME";
+		CoreName[0x02] = "Nuked OPLL";
 		CanPan = (TempCOpts->EmuCore == 0x00);
 		
 		ChnCount = 14;	// 9 + 5
@@ -1264,20 +1273,15 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 	if (ChnCount > 15)
 		ChnCount = 15;	// there are only 15 sliders
 	
-	for (CurChn = 0x00; CurChn < 0x02; CurChn ++)
+	for (CurChn = 0x00; CurChn < 0x03; CurChn++)
 	{
-		CTRL_SET_ENABLE(CfgOptPan, EmuCoreRadio1 + CurChn, MultiCore && EnableChk);
-		
-		TempStr = (! CurChn) ? "Default" : "Alternative";
-		if (CoreName[CurChn] == NULL)
-			sprintf(TempName, "%s Core", TempStr);
-		else
-			sprintf(TempName, "%s (%s)", TempStr, CoreName[CurChn]);
+		CTRL_SET_ENABLE(CfgOptPan, EmuCoreRadio1 + CurChn, EnableChk && MultiCore && (CurChn < MaxMultiCore));
+		sprintf(TempName, "%s", CoreName[CurChn]);
 		PanPos = strlen(TempName);
 		SetDlgItemText(CfgOptPan, EmuCoreRadio1 + CurChn, TempName);
 	}
-	
-	CheckRadioButton(CfgOptPan, EmuCoreRadio1, EmuCoreRadio2,
+
+	CheckRadioButton(CfgOptPan, EmuCoreRadio1, EmuCoreRadio3,
 					EmuCoreRadio1 + TempCOpts->EmuCore);
 	
 	for (CurChn = 0; CurChn < ChnCount; CurChn ++)

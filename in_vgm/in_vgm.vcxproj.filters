@@ -1,0 +1,529 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{d349f4c4-6b19-47fa-b093-f4e44acfbece}</UniqueIdentifier>
+      <Extensions>c;def</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{497b0aff-518c-4f87-ba1b-b3ef39c5ffed}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{41a9807a-f741-4b55-953c-dcae02d2fb67}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Sound Core">
+      <UniqueIdentifier>{ebbee5d5-5054-49c1-8dba-2cf67b33b7b1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dlg_cfg.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dlg_fileinfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="in_vgm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ini_func.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\pt_ioctl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\VGMPlay.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2151intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2203intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2413intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2608intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2610intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\2612intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\262intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\3526intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\3812intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\8950intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\adlibemu_opl2.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\adlibemu_opl3.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ay8910.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ay_intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\c140.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\c352.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\c6280.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\c6280intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\ChipMapper.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\dac_control.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\emu2149.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\emu2413.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\es5503.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\es5506.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\fm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\fm2612.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\fmopl.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\gb.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\iremga20.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\k051649.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\k053260.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\k054539.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\multipcm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\nes_apu.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\nes_intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\np_nes_apu.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\np_nes_dmc.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\np_nes_fds.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\okim6258.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\okim6295.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\Ootake_PSG.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\opl.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\panning.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\pokey.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\pwm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\qsound_ctr.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\qsound_intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\qsound_mame.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\rf5c68.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\saa1099.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\scd_pcm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\scsp.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\scspdsp.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\scsplfo.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\segapcm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\sn76489.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\sn76496.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\sn764intf.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\upd7759.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\vsu.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ws_audio.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\x1_010.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ym2151.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ym2413.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ym2612.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ym3438.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ymdeltat.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ymf262.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ymf271.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ymf278b.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\ymz280b.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\opll.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="in_vgm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ini_func.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\PortTalk_IOCTL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\stdbool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\VGMFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\VGMPlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\VGMPlay_Intf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2151intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2203intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2413intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2413tone.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2608intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2610intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\2612intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\262intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\281btone.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\3526intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\3812intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\8950intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\adlibemu.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ay8910.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ay_intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\c140.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\c352.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\c6280.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\c6280intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ChipIncl.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\ChipMapper.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\dac_control.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\emu2149.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\emu2413.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\emutypes.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\es5503.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\es5506.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\fm.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\fmopl.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\gb.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\iremga20.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\k051649.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\k053260.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\k054539.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\mamedef.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\multipcm.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\nes_apu.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\nes_defs.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\nes_intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\np_nes_apu.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\np_nes_dmc.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\np_nes_fds.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\okim6258.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\okim6295.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\Ootake_PSG.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\opl.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\panning.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\pokey.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\pwm.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\qsound_ctr.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\qsound_intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\qsound_mame.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\rf5c68.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\saa1099.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\scd_pcm.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\scsp.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\scspdsp.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\segapcm.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\sn76489.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\sn76496.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\sn764intf.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\upd7759.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\vrc7tone.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\vsu.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ws_audio.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ws_initialIo.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\x1_010.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ym2151.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ym2413.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ym2612.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ym3438.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ymdeltat.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ymf262.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ymf271.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ymf278b.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\ymz280b.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\opll.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="images\logo.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="images\tabicons.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="in_vgm.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

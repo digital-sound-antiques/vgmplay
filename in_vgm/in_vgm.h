@@ -12,13 +12,13 @@
 
 #else
 
-#define VER_EXTRA	""
-#define VER_DATE	""
+#define VER_EXTRA	"-unofficial"
+#define VER_DATE	" (2020 Jan 5)"
 
 #endif
 
 #define INVGM_VERSION		VGMPLAY_VER_STR VER_EXTRA
-#define INVGM_TITLE			"VGM Input Plugin v" INVGM_VERSION
+#define INVGM_TITLE			"VGM Input Plugin v" INVGM_VERSION 
 #define INVGM_TITLE_FULL	"VGM Input Plugin v" INVGM_VERSION VER_DATE
 
 typedef struct plugin_options

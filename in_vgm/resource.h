@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by in_vgm.rc
 //
 #define MainIcon                        101
@@ -90,8 +90,6 @@
 #define BrwsrInfoButton                 2017
 #define EmuOptChipList                  3001
 #define EmuOptChipNumList               3002
-#define EmuCoreRadio1                   3003
-#define EmuCoreRadio2                   3004
 #define PanChn1Label                    3005
 #define PanChn2Label                    3006
 #define PanChn3Label                    3007
@@ -122,14 +120,17 @@
 #define PanChn13Slider                  3032
 #define PanChn14Slider                  3033
 #define PanChn15Slider                  3034
+#define EmuCoreRadio1                   3035
+#define EmuCoreRadio2                   3036
+#define EmuCoreRadio3                   3037
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        212
+#define _APS_NEXT_RESOURCE_VALUE        213
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         3038
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

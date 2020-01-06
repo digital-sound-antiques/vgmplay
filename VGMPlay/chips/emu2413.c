@@ -1,5 +1,5 @@
 /**
- * emu2413 v1.2.0
+ * emu2413 v1.2.2
  * https://github.com/digital-sound-antiques/emu2413
  * Copyright (C) 2020 Mitsutaka Okazaki
  */
@@ -25,20 +25,20 @@
 /* clang-format off */
 static uint8_t default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {{
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, // 0: Original
-0x61,0x61,0x1e,0x17,0xf0,0x78,0x00,0x17, // 1: Violin
-0x13,0x41,0x1a,0x0d,0xf8,0xf7,0x23,0x13, // 2: Guitar
+0x71,0x61,0x1e,0x17,0xd0,0x78,0x00,0x17, // 1: Violin
+0x13,0x41,0x1a,0x0d,0xd8,0xf7,0x23,0x13, // 2: Guitar
 0x13,0x01,0x99,0x00,0xf2,0xd4,0x21,0x23, // 3: Piano
-0x11,0x61,0x0e,0x07,0xfd,0x64,0x70,0x27, // 4: Flute
-0x32,0x21,0x1e,0x06,0xf1,0x76,0x01,0x28, // 5: Clarinet
-0x21,0x22,0x16,0x05,0xf0,0x71,0x00,0x18, // 6: Oboe
+0x11,0x61,0x0e,0x07,0x8d,0x64,0x70,0x27, // 4: Flute
+0x32,0x21,0x1e,0x06,0xe1,0x76,0x01,0x28, // 5: Clarinet
+0x31,0x22,0x16,0x05,0xe0,0x71,0x00,0x18, // 6: Oboe
 0x21,0x61,0x1d,0x07,0x82,0x81,0x11,0x07, // 7: Trumpet
 0x33,0x21,0x2d,0x13,0xb0,0x70,0x00,0x07, // 8: Organ
 0x61,0x61,0x1b,0x06,0x64,0x65,0x10,0x17, // 9: Horn
-0x41,0x61,0x0b,0x1b,0x85,0xf0,0x71,0x07, // A: Synthesizer
-0x33,0x01,0x83,0x11,0xfa,0xef,0x10,0x04, // B: Harpsichord
-0x17,0xc1,0x20,0x07,0xfe,0xf7,0x22,0x22, // C: Vibraphone
-0x61,0x50,0x0c,0x05,0xd2,0xf5,0x40,0x42, // D: Synthesizer Bass
-0x01,0x01,0x56,0x03,0xf4,0x90,0x03,0x02, // E: Acoustic Bass
+0x41,0x61,0x0b,0x18,0x85,0xf0,0x81,0x07, // A: Synthesizer
+0x33,0x01,0x83,0x11,0xea,0xef,0x10,0x04, // B: Harpsichord
+0x17,0xc1,0x24,0x07,0xf8,0xf8,0x22,0x12, // C: Vibraphone
+0x61,0x50,0x0c,0x05,0xd2,0xf5,0x40,0x42, // D: Synthsizer Bass
+0x01,0x01,0x55,0x03,0xe4,0x90,0x03,0x02, // E: Acoustic Bass
 0x41,0x41,0x89,0x03,0xf1,0xe4,0xc0,0x13, // F: Electric Guitar
 0x01,0x01,0x18,0x0f,0xdf,0xf8,0x6a,0x6d, // R: Bass Drum
 0x01,0x01,0x00,0x00,0xc8,0xd8,0xa7,0x68, // R: High-Hat(M) / Snare Drum(C)
@@ -97,6 +97,7 @@ static uint8_t default_inst[OPLL_TONE_NUM][(16 + 3) * 8] = {{
 #define EG_STEP 0.375
 #define EG_BITS 7
 #define EG_MUTE ((1 << EG_BITS) - 1)
+#define EG_MAX (EG_MUTE - 3)
 
 /* dynamic range of total level */
 #define TL_STEP 0.75
@@ -863,53 +864,23 @@ static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *slave_slot, uint16_
   uint32_t mask = (1 << slot->eg_shift) - 1;
   uint8_t s;
 
+  if (slot->eg_state == ATTACK) {
+    if (0 < slot->eg_out && slot->eg_rate_h > 0 && (eg_counter & mask & ~3) == 0) {
+      s = lookup_attack_step(slot, eg_counter);
+      if (0 < s) {
+        slot->eg_out = max(0, ((int)slot->eg_out - (slot->eg_out >> s) - 1));
+      }
+    }
+  } else {
+    if (slot->eg_rate_h > 0 && (eg_counter & mask) == 0) {
+      slot->eg_out = min(EG_MUTE, slot->eg_out + lookup_decay_step(slot, eg_counter));
+    }
+  }
+
   switch (slot->eg_state) {
-  case ATTACK:
-    if (slot->eg_rate_h == 15) {
-      /* when maximum eg_rate_h is set after key-on in attack state */
-      slot->eg_state = UNKNOWN;
-      request_update(slot, UPDATE_EG);
-    } else {
-      if (0 < slot->eg_out && slot->eg_rate_h > 0 && (eg_counter & mask & ~3) == 0) {
-        s = lookup_attack_step(slot, eg_counter);
-        if (0 < s) {
-          slot->eg_out = max(0, ((int)slot->eg_out - (slot->eg_out >> s) - 1));
-        }
-      }
-      if (slot->eg_out == 0) {
-        slot->eg_state = DECAY;
-        request_update(slot, UPDATE_EG);
-      }
-    }
-    break;
-
-  case DECAY:
-    if (slot->eg_rate_h > 0 && (eg_counter & mask) == 0) {
-      slot->eg_out += lookup_decay_step(slot, eg_counter);
-    }
-    if ((slot->eg_out >> (EG_BITS - SL_BITS)) == slot->patch->SL) {
-      slot->eg_state = SUSTAIN;
-      request_update(slot, UPDATE_EG);
-    }
-    break;
-
-  case SUSTAIN:
-  case RELEASE:
-    if (slot->eg_rate_h > 0 && (eg_counter & mask) == 0) {
-      slot->eg_out += lookup_decay_step(slot, eg_counter);
-    }
-    if (slot->eg_out > EG_MUTE) {
-      slot->eg_out = EG_MUTE;
-    }
-    break;
-
   case DAMP:
-    if (slot->eg_rate_h > 0 && (eg_counter & mask) == 0) {
-      slot->eg_out += lookup_decay_step(slot, eg_counter);
-    }
-    if (slot->eg_out >= EG_MUTE) {
-      slot->eg_out = EG_MUTE;
-      if ((slot->type & 1) && (!slave_slot || slave_slot->eg_out >= EG_MUTE)) {
+    if (slot->eg_out >= EG_MAX) {
+      if ((slot->type & 1) && (!slave_slot || slave_slot->eg_out >= EG_MAX)) {
         finish_damp_state(slot);
         if (slave_slot) {
           finish_damp_state(slave_slot);
@@ -918,7 +889,22 @@ static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *slave_slot, uint16_
     }
     break;
 
-  case UNKNOWN:
+  case ATTACK:
+    if (slot->eg_out == 0) {
+      slot->eg_state = DECAY;
+      request_update(slot, UPDATE_EG);
+    }
+    break;
+
+  case DECAY:
+    if ((slot->eg_out >> (EG_BITS - SL_BITS)) == slot->patch->SL) {
+      slot->eg_state = SUSTAIN;
+      request_update(slot, UPDATE_EG);
+    }
+    break;
+
+  case SUSTAIN:
+  case RELEASE:
   default:
     break;
   }
@@ -955,7 +941,7 @@ static INLINE int16_t lookup_exp_table(uint16_t i) {
 
 static INLINE int16_t to_linear(uint16_t h, OPLL_SLOT *slot, int16_t am) {
   uint16_t att;
-  if (slot->eg_out >= (EG_MUTE - 3))
+  if (slot->eg_out >= EG_MAX)
     return 0;
 
   att = min(127, (slot->eg_out + slot->tll + am)) << 4;
@@ -977,7 +963,7 @@ static INLINE int16_t calc_slot_mod(OPLL *opll, int ch) {
   uint8_t am = slot->patch->AM ? opll->lfo_am : 0;
 
   slot->output[1] = slot->output[0];
-  slot->output[0] = to_linear(slot->wave_table[(slot->pg_out + fm) & (PG_WIDTH - 1)], slot, am) >> 1;
+  slot->output[0] = to_linear(slot->wave_table[(slot->pg_out - 1 + fm) & (PG_WIDTH - 1)], slot, am) >> 1;
   
   return slot->output[0];
 }

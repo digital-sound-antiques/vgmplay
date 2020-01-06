@@ -1192,7 +1192,7 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 	case 0x01:	// YM2413
 		MultiCore = true;
 		MaxMultiCore = 3;
-		CoreName[0x00] = "EMU2413 (v1.2.x)";
+		CoreName[0x00] = "EMU2413 (" EMU2413_VERSION ")";
 		CoreName[0x01] = "MAME";
 		CoreName[0x02] = "Nuked OPLL";
 		CanPan = (TempCOpts->EmuCore == 0x00);

@@ -1,5 +1,5 @@
 /**
- * emu2413 v1.2.4
+ * emu2413 v1.2.5
  * https://github.com/digital-sound-antiques/emu2413
  * Copyright (C) 2020 Mitsutaka Okazaki
  *
@@ -801,14 +801,13 @@ static void update_short_noise(OPLL *opll) {
   opll->short_noise = (h_bit2 ^ h_bit7) | (h_bit3 ^ c_bit5) | (c_bit3 ^ c_bit5);
 }
 
-static INLINE void calc_phase(OPLL_SLOT *slot, int32_t pm_phase, uint8_t test) {
+static INLINE void calc_phase(OPLL_SLOT *slot, int32_t pm_phase, uint8_t reset) {
   const int8_t pm = slot->patch->PM ? pm_table[(slot->fnum >> 6) & 7][pm_phase >> (PM_DP_BITS - PM_PG_BITS)] : 0;
-  if (test) {
-    slot->pg_phase = (((slot->fnum & 0x1ff) * 2 + pm) * ml_table[slot->patch->ML]) << slot->blk >> 2;
-  } else {
-    slot->pg_phase += (((slot->fnum & 0x1ff) * 2 + pm) * ml_table[slot->patch->ML]) << slot->blk >> 2;
-    slot->pg_phase &= (DP_WIDTH - 1);
+  if (reset) {
+    slot->pg_phase = 0;
   }
+  slot->pg_phase += (((slot->fnum & 0x1ff) * 2 + pm) * ml_table[slot->patch->ML]) << slot->blk >> 2;
+  slot->pg_phase &= (DP_WIDTH - 1);
   slot->pg_out = slot->pg_phase >> DP_BASE_BITS;
 }
 
@@ -854,7 +853,7 @@ static INLINE uint8_t lookup_decay_step(OPLL_SLOT *slot, uint32_t counter) {
   }
 }
 
-static INLINE void finish_damp_state(OPLL_SLOT *slot) {
+static INLINE void start_envelope(OPLL_SLOT *slot) {
   if (min(15, slot->patch->AR + (slot->rks >> 2)) == 15) {
     slot->eg_state = DECAY;
     slot->eg_out = 0;
@@ -866,10 +865,17 @@ static INLINE void finish_damp_state(OPLL_SLOT *slot) {
   request_update(slot, UPDATE_EG);
 }
 
-static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *slave_slot, uint16_t eg_counter, uint8_t test) {
+static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *mod_slot, uint16_t eg_counter, uint8_t test) {
 
   uint32_t mask = (1 << slot->eg_shift) - 1;
   uint8_t s;
+
+  if (slot->eg_state != DAMP && mod_slot && mod_slot->eg_state == DAMP) {
+    if (mod_slot->eg_out >= EG_MAX) {
+      start_envelope(mod_slot);
+      slot->pg_phase = slot->pg_keep ? slot->pg_phase : 0;
+    }
+  }
 
   if (slot->eg_state == ATTACK) {
     if (0 < slot->eg_out && slot->eg_rate_h > 0 && (eg_counter & mask & ~3) == 0) {
@@ -887,11 +893,8 @@ static INLINE void calc_envelope(OPLL_SLOT *slot, OPLL_SLOT *slave_slot, uint16_
   switch (slot->eg_state) {
   case DAMP:
     if (slot->eg_out >= EG_MAX) {
-      if ((slot->type & 1) && (!slave_slot || slave_slot->eg_out >= EG_MAX)) {
-        finish_damp_state(slot);
-        if (slave_slot) {
-          finish_damp_state(slave_slot);
-        }
+      if (slot->type & 1) {
+        start_envelope(slot);
       }
     }
     break;
@@ -927,14 +930,12 @@ static void update_slots(OPLL *opll) {
 
   for (i = 0; i < 18; i++) {
     OPLL_SLOT *slot = &opll->slot[i];
-    OPLL_SLOT *slave;
+    OPLL_SLOT *mod_slot = (slot->type == 1) ? &opll->slot[i-1] : NULL;
     if (slot->update_requests) {
       commit_slot_update(slot);
     }
     calc_phase(slot, opll->pm_phase, opll->test_flag & 4);
-
-    slave = slot->type == 1 ? &opll->slot[i - 1] : NULL;
-    calc_envelope(slot, slave, opll->eg_counter, opll->test_flag & 1);
+    calc_envelope(slot, mod_slot, opll->eg_counter, opll->test_flag & 1);
   }
 }
 
@@ -971,7 +972,7 @@ static INLINE int16_t calc_slot_mod(OPLL *opll, int ch) {
 
   slot->output[1] = slot->output[0];
   slot->output[0] = to_linear(slot->wave_table[(slot->pg_out + fm) & (PG_WIDTH - 1)], slot, am) >> 1;
-  
+
   return slot->output[0];
 }
 

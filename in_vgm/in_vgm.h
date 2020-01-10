@@ -12,12 +12,12 @@
 
 #else
 
-#define VER_EXTRA	"-unofficial.5"
-#define VER_DATE	" (2020 Jan 10)"
+#define VER_EXTRA	"-unofficial.6"
+#define VER_DATE	" (2020 Jan 11)"
 
 #endif
 
-#define EMU2413_VERSION "1.2.5"
+#define EMU2413_VERSION "1.2.6"
 
 #define INVGM_VERSION		VGMPLAY_VER_STR VER_EXTRA
 #define INVGM_TITLE			"VGM Input Plugin v" INVGM_VERSION 

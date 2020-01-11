@@ -1,5 +1,5 @@
 /**
- * emu2413 v1.2.6
+ * emu2413 v1.2.7
  * https://github.com/digital-sound-antiques/emu2413
  * Copyright (C) 2020 Mitsutaka Okazaki
  *
@@ -436,8 +436,6 @@ static void initializeTables() {
 #define MOD(o, x) (&(o)->slot[(x) << 1])
 #define CAR(o, x) (&(o)->slot[((x) << 1) | 1])
 #define BIT(s, b) (((s) >> (b)) & 1)
-
-#define OPLL_DEBUG 0
 
 #if OPLL_DEBUG
 static void _debug_print_patch(OPLL_SLOT *slot) {
@@ -963,17 +961,20 @@ static INLINE int16_t calc_slot_car(OPLL *opll, int ch, int16_t fm) {
 
   uint8_t am = slot->patch->AM ? opll->lfo_am : 0;
 
-  return to_linear(slot->wave_table[(slot->pg_out + 2 * fm) & (PG_WIDTH - 1)], slot, am);
+  slot->output[1] = slot->output[0];
+  slot->output[0] = to_linear(slot->wave_table[(slot->pg_out + 2 * (fm >> 1)) & (PG_WIDTH - 1)], slot, am);
+  
+  return slot->output[0];
 }
 
 static INLINE int16_t calc_slot_mod(OPLL *opll, int ch) {
   OPLL_SLOT *slot = MOD(opll, ch);
 
-  int16_t fm = slot->patch->FB > 0 ? (slot->output[1] + slot->output[0]) >> (8 - slot->patch->FB) : 0;
+  int16_t fm = slot->patch->FB > 0 ? (slot->output[1] + slot->output[0]) >> (9 - slot->patch->FB) : 0;
   uint8_t am = slot->patch->AM ? opll->lfo_am : 0;
 
   slot->output[1] = slot->output[0];
-  slot->output[0] = to_linear(slot->wave_table[(slot->pg_out + fm) & (PG_WIDTH - 1)], slot, am) >> 1;
+  slot->output[0] = to_linear(slot->wave_table[(slot->pg_out + fm) & (PG_WIDTH - 1)], slot, am);
 
   return slot->output[0];
 }
@@ -1085,7 +1086,7 @@ static void update_output(OPLL *opll) {
 INLINE static void mix_output(OPLL *opll) {
   int16_t out = 0;
   int i;
-  for (i = 0; i < 15; i++) {
+  for (i = 0; i < 14; i++) {
     out += opll->ch_out[i];
   }
   if (opll->conv) {
@@ -1099,7 +1100,7 @@ INLINE static void mix_output_stereo(OPLL *opll) {
   int16_t *out = opll->mix_out;
   int i;
   out[0] = out[1] = 0;
-  for (i = 0; i < 15; i++) {
+  for (i = 0; i < 14; i++) {
     if (opll->pan[i] & 1)
       out[1] += opll->ch_out[i];
     if (opll->pan[i] & 2)
@@ -1210,7 +1211,7 @@ void OPLL_reset(OPLL *opll) {
   for (i = 0; i < 15; i++)
     opll->pan[i] = 3;
 
-  for (i = 0; i < 15; i++) {
+  for (i = 0; i < 14; i++) {
     opll->ch_out[i] = 0;
   }
 }

@@ -15,6 +15,7 @@
 #endif
 #include "emu2413.h"
 #include "2413intf.h"
+#include "panning.h"
 
 #ifdef ENABLE_ALL_CORES
 #define EC_NUKED	0x02	// Nuked OPLL
@@ -375,6 +376,8 @@ void ym2413_set_panning(UINT8 ChipID, INT16* PanVals)
 {
 	ym2413_state *info = &YM2413Data[ChipID];
 	UINT8 CurChn;
+	UINT8 EmuChn;
+	float pan[2];
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
@@ -382,8 +385,16 @@ void ym2413_set_panning(UINT8 ChipID, INT16* PanVals)
 		break;
 #endif
 	case EC_EMU2413:
-		for (CurChn = 0x00; CurChn < 0x0E; CurChn ++)
-			OPLL_setPan(info->chip, CurChn, _emu2413_make_pan(PanVals[CurChn]));
+		for (CurChn = 0x00; CurChn < 0x0E; CurChn ++) {
+			calc_panning(pan, PanVals[CurChn]);
+			if (CurChn < 10)
+				EmuChn = CurChn;
+			else if (CurChn < 13)
+				EmuChn = CurChn + 1;
+			else
+				EmuChn = 10;
+			OPLL_setPanFine(info->chip, EmuChn, pan);
+		}
 		break;
 	}
 	

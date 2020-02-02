@@ -116,10 +116,10 @@ BEGIN
     CONTROL         "Don't &cache file information",NoInfoCacheCheck,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,86,140,10
 END
 
-DlgConfigMain DIALOG 0, 0, 286, 210
+DlgConfigMain DIALOGEX 0, 0, 283, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "VGM plugin configuration"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     CONTROL         "Immediate &update",ImmediateUpdCheck,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,195,83,10
     PUSHBUTTON      "Help",HelpButton,108,193,52,14,WS_DISABLED
@@ -309,6 +309,10 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    DlgConfigMain, DIALOG
+    BEGIN
+    END
+
     DlgCfgOptPan, DIALOG
     BEGIN
     END
@@ -322,6 +326,11 @@ END
 //
 
 DlgCfgOptPan AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+DlgConfigMain AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

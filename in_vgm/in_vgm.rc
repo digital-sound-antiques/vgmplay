@@ -116,7 +116,7 @@ BEGIN
     CONTROL         "Don't &cache file information",NoInfoCacheCheck,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,115,86,140,10
 END
 
-DlgConfigMain DIALOGEX 0, 0, 283, 213
+DlgConfigMain DIALOGEX 0, 0, 284, 214
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "VGM plugin configuration"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
@@ -311,6 +311,8 @@ GUIDELINES DESIGNINFO
 BEGIN
     DlgConfigMain, DIALOG
     BEGIN
+        RIGHTMARGIN, 283
+        BOTTOMMARGIN, 213
     END
 
     DlgCfgOptPan, DIALOG

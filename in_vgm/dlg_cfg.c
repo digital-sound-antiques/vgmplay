@@ -1225,6 +1225,12 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 		SpcName[1] = "PSG Chn";
 		break;*/
 	case 0x09:	// YM3812
+		MultiCore = true;
+		MaxMultiCore = 3;
+		CoreName[0x00] = "AdLibEmu";
+		CoreName[0x01] = "MAME";
+		CoreName[0x02] = "EMU8950 (" EMU8950_VERSION ")";;
+		break;
 	case 0x0C:	// YMF262
 		MultiCore = true;
 		CoreName[0x00] = "AdLibEmu";

@@ -252,6 +252,12 @@
     <ClCompile Include="..\VGMPlay\chips\opll.c">
       <Filter>Sound Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\emu8950.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VGMPlay\chips\emuadpcm.c">
+      <Filter>Sound Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="in_vgm.h">
@@ -507,6 +513,12 @@
       <Filter>Sound Core</Filter>
     </ClInclude>
     <ClInclude Include="..\VGMPlay\chips\opll.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\emu8950.h">
+      <Filter>Sound Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VGMPlay\chips\emuadpcm.h">
       <Filter>Sound Core</Filter>
     </ClInclude>
   </ItemGroup>

@@ -223,6 +223,8 @@ copy  Debug\in_vgm.dll  xmplay36\</Command>
     <ClCompile Include="..\VGMPlay\chips\dac_control.c" />
     <ClCompile Include="..\VGMPlay\chips\emu2149.c" />
     <ClCompile Include="..\VGMPlay\chips\emu2413.c" />
+    <ClCompile Include="..\VGMPlay\chips\emu8950.c" />
+    <ClCompile Include="..\VGMPlay\chips\emuadpcm.c" />
     <ClCompile Include="..\VGMPlay\chips\es5503.c" />
     <ClCompile Include="..\VGMPlay\chips\es5506.c" />
     <ClCompile Include="..\VGMPlay\chips\fm.c" />
@@ -317,6 +319,8 @@ copy  Debug\in_vgm.dll  xmplay36\</Command>
     <ClInclude Include="..\VGMPlay\chips\dac_control.h" />
     <ClInclude Include="..\VGMPlay\chips\emu2149.h" />
     <ClInclude Include="..\VGMPlay\chips\emu2413.h" />
+    <ClInclude Include="..\VGMPlay\chips\emu8950.h" />
+    <ClInclude Include="..\VGMPlay\chips\emuadpcm.h" />
     <ClInclude Include="..\VGMPlay\chips\emutypes.h" />
     <ClInclude Include="..\VGMPlay\chips\es5503.h" />
     <ClInclude Include="..\VGMPlay\chips\es5506.h" />

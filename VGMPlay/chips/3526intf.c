@@ -23,6 +23,12 @@
 //#include "cpuintrf.h"
 #include "3526intf.h"
 #include "fmopl.h"
+#include "emu8950.h"
+
+#ifdef ENABLE_ALL_CORES
+#define EC_MAME		0x01
+#endif
+#define EC_EMU8950	0x00
 
 typedef struct _ym3526_state ym3526_state;
 struct _ym3526_state
@@ -37,6 +43,8 @@ struct _ym3526_state
 
 extern UINT8 CHIP_SAMPLING_MODE;
 extern INT32 CHIP_SAMPLE_RATE;
+static UINT8 EMU_CORE = 0x00;
+
 #define MAX_CHIPS	0x02
 static ym3526_state YM3526Data[MAX_CHIPS];
 
@@ -84,13 +92,79 @@ static void TimerHandler(void *param,int c,int period)
 	}
 }
 
+static void _emu8950_calc_stereo(OPL *opl, INT32 **out, int samples)
+{
+	INT32 *bufL = out[0];
+	INT32 *bufR = out[1];
+	INT32 buffers[2];
+	int i;
+
+	for (i = 0; i < samples; i++)
+	{
+		OPL_calcStereo(opl, buffers);
+		bufL[i] = buffers[0] << 1;
+		bufR[i] = buffers[1] << 1;
+	}
+}
+
+static void _emu8950_set_mute_mask(OPL *opl, UINT32 MuteMask)
+{
+	unsigned char CurChn;
+	UINT32 ChnMsk;
+
+	for (CurChn = 0; CurChn < 14; CurChn++)
+	{
+		if (CurChn < 9)
+		{
+			ChnMsk = OPL_MASK_CH(CurChn);
+		}
+		else
+		{
+			switch (CurChn)
+			{
+			case 9:
+				ChnMsk = OPL_MASK_BD;
+				break;
+			case 10:
+				ChnMsk = OPL_MASK_SD;
+				break;
+			case 11:
+				ChnMsk = OPL_MASK_TOM;
+				break;
+			case 12:
+				ChnMsk = OPL_MASK_CYM;
+				break;
+			case 13:
+				ChnMsk = OPL_MASK_HH;
+				break;
+			default:
+				ChnMsk = 0;
+				break;
+			}
+		}
+		if ((MuteMask >> CurChn) & 0x01)
+			opl->mask |= ChnMsk;
+		else
+			opl->mask &= ~ChnMsk;
+	}
+}
 
 //static STREAM_UPDATE( ym3526_stream_update )
 void ym3526_stream_update(UINT8 ChipID, stream_sample_t **outputs, int samples)
 {
 	//ym3526_state *info = (ym3526_state *)param;
 	ym3526_state *info = &YM3526Data[ChipID];
-	ym3526_update_one(info->chip, outputs, samples);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		ym3526_update_one(info->chip, outputs, samples);
+		break;
+#endif
+	case EC_EMU8950:
+		_emu8950_calc_stereo(info->chip, outputs, samples);
+		break;
+	}
 }
 
 static void _stream_update(void *param/*, int interval*/)
@@ -98,7 +172,17 @@ static void _stream_update(void *param/*, int interval*/)
 	ym3526_state *info = (ym3526_state *)param;
 	//stream_update(info->stream);
 	
-	ym3526_update_one(info->chip, DUMMYBUF, 0);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES		
+	case EC_MAME:
+	  ym3526_update_one(info->chip, DUMMYBUF, 0);
+	  break;
+#endif
+	case EC_EMU8950:
+	  _emu8950_calc_stereo(info->chip, DUMMYBUF, 0);
+	  break;
+	}
 }
 
 
@@ -121,17 +205,25 @@ int device_start_ym3526(UINT8 ChipID, int clock)
 	//info->intf = device->static_config ? (const ym3526_interface *)device->static_config : &dummy;
 	//info->intf = &dummy;
 	//info->device = device;
+	switch(EMU_CORE) {
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		/* stream system initialize */
+		info->chip = ym3526_init(clock,rate);
+		//assert_always(info->chip != NULL, "Error creating YM3526 chip");
 
-	/* stream system initialize */
-	info->chip = ym3526_init(clock,rate);
-	//assert_always(info->chip != NULL, "Error creating YM3526 chip");
-
-	//info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
-	/* YM3526 setup */
-	ym3526_set_timer_handler (info->chip, TimerHandler, info);
-	ym3526_set_irq_handler   (info->chip, IRQHandler, info);
-	ym3526_set_update_handler(info->chip, _stream_update, info);
-
+		//info->stream = stream_create(device,0,1,rate,info,ym3526_stream_update);
+		/* YM3526 setup */
+		ym3526_set_timer_handler (info->chip, TimerHandler, info);
+		ym3526_set_irq_handler   (info->chip, IRQHandler, info);
+		ym3526_set_update_handler(info->chip, _stream_update, info);
+		break;
+#endif
+	case EC_EMU8950:
+		info->chip = OPL_new(clock,rate);
+		OPL_setChipType(info->chip, 1);
+		break;
+	}
 	//info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
 	//info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
 	
@@ -143,7 +235,17 @@ void device_stop_ym3526(UINT8 ChipID)
 {
 	//ym3526_state *info = get_safe_token(device);
 	ym3526_state *info = &YM3526Data[ChipID];
-	ym3526_shutdown(info->chip);
+switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		ym3526_shutdown(info->chip);
+		break;
+#endif
+	case EC_EMU8950:
+		OPL_delete(info->chip);
+		break;
+	}
 }
 
 //static DEVICE_RESET( ym3526 )
@@ -151,7 +253,17 @@ void device_reset_ym3526(UINT8 ChipID)
 {
 	//ym3526_state *info = get_safe_token(device);
 	ym3526_state *info = &YM3526Data[ChipID];
-	ym3526_reset_chip(info->chip);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		ym3526_reset_chip(info->chip);
+		break;
+#endif
+	case EC_EMU8950:
+		OPL_reset(info->chip);
+		break;
+	}
 }
 
 
@@ -160,7 +272,16 @@ UINT8 ym3526_r(UINT8 ChipID, offs_t offset)
 {
 	//ym3526_state *info = get_safe_token(device);
 	ym3526_state *info = &YM3526Data[ChipID];
-	return ym3526_read(info->chip, offset & 1);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		return ym3526_read(info->chip, offset & 1);
+#endif
+	case EC_EMU8950:
+		OPL_writeIO(info->chip, 0, offset);
+		return OPL_readIO(info->chip);		
+	}
 }
 
 //WRITE8_DEVICE_HANDLER( ym3526_w )
@@ -168,13 +289,23 @@ void ym3526_w(UINT8 ChipID, offs_t offset, UINT8 data)
 {
 	//ym3526_state *info = get_safe_token(device);
 	ym3526_state *info = &YM3526Data[ChipID];
-	ym3526_write(info->chip, offset & 1, data);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		ym3526_write(info->chip, offset & 1, data);
+		break;
+#endif
+	case EC_EMU8950:
+		OPL_writeIO(info->chip, offset & 1, data);
+		break;
+	}
 }
 
 //READ8_DEVICE_HANDLER( ym3526_status_port_r )
 UINT8 ym3526_status_port_r(UINT8 ChipID, offs_t offset)
 {
-	return ym3526_r(ChipID, 0);
+  return ym3526_r(ChipID, 0);
 }
 //READ8_DEVICE_HANDLER( ym3526_read_port_r )
 UINT8 ym3526_read_port_r(UINT8 ChipID, offs_t offset)
@@ -196,8 +327,19 @@ void ym3526_write_port_w(UINT8 ChipID, offs_t offset, UINT8 data)
 void ym3526_set_mute_mask(UINT8 ChipID, UINT32 MuteMask)
 {
 	ym3526_state *info = &YM3526Data[ChipID];
-	opl_set_mute_mask(info->chip, MuteMask);
+	switch(EMU_CORE)
+	{
+#ifdef ENABLE_ALL_CORES
+	case EC_MAME:
+		opl_set_mute_mask(info->chip, MuteMask);
+		break;
+#endif
+	case EC_EMU8950:
+		_emu8950_set_mute_mask(info->chip, MuteMask);
+		break;
+	}
 }
+
 
 
 /**************************************************************************

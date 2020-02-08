@@ -192,6 +192,8 @@ EMUOBJS = \
 	$(EMUOBJ)/es5506.o \
 	$(EMUOBJ)/emu2149.o \
 	$(EMUOBJ)/emu2413.o \
+	$(EMUOBJ)/emu8950.o \
+	$(EMUOBJ)/emuadpcm.o \
 	$(EMUOBJ)/fm2612.o \
 	$(EMUOBJ)/fm.o \
 	$(EMUOBJ)/fmopl.o \

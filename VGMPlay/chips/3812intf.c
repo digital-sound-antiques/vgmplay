@@ -25,6 +25,7 @@
 #include "3812intf.h"
 #ifdef ENABLE_ALL_CORES
 #include "fmopl.h"
+#include "emu8950.h"
 #endif
 
 #define OPLTYPE_IS_OPL2
@@ -34,6 +35,7 @@
 #define EC_DBOPL	0x00	// DosBox OPL (AdLibEmu)
 #ifdef ENABLE_ALL_CORES
 #define EC_MAME		0x01	// YM3826 core from MAME
+#define EC_EMU8950 0x02
 #endif
 
 typedef struct _ym3812_state ym3812_state;
@@ -98,6 +100,22 @@ static void TimerHandler(void *param,int c,int period)
 	}
 }
 
+#ifdef ENABLE_ALL_CORES
+static void _emu8950_calc_stereo(OPL *opl, INT32 **out, int samples)
+{
+	INT32 *bufL = out[0];
+	INT32 *bufR = out[1];
+	INT32 buffers[2];
+	int i;
+
+	for (i = 0; i < samples; i++)
+	{
+		OPL_calcStereo(opl, buffers);
+		bufL[i] = buffers[0] << 1;
+		bufR[i] = buffers[1] << 1;
+	}
+}
+#endif
 
 //static STREAM_UPDATE( ym3812_stream_update )
 void ym3812_stream_update(UINT8 ChipID, stream_sample_t **outputs, int samples)
@@ -110,6 +128,9 @@ void ym3812_stream_update(UINT8 ChipID, stream_sample_t **outputs, int samples)
 	case EC_MAME:
 		ym3812_update_one(info->chip, outputs, samples);
 		break;
+	case EC_EMU8950:
+		_emu8950_calc_stereo(info->chip, outputs, samples);
+		break;		
 #endif
 	case EC_DBOPL:
 		adlib_OPL2_getsample(info->chip, outputs, samples);
@@ -128,6 +149,9 @@ static void _stream_update(void * param/*, int interval*/)
 	case EC_MAME:
 		ym3812_update_one(info->chip, DUMMYBUF, 0);
 		break;
+	case EC_EMU8950:
+		_emu8950_calc_stereo(info->chip, DUMMYBUF, 0);
+		break;		
 #endif
 	case EC_DBOPL:
 		adlib_OPL2_getsample(info->chip, DUMMYBUF, 0);
@@ -174,6 +198,10 @@ int device_start_ym3812(UINT8 ChipID, int clock)
 		//info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
 		//info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
 		break;
+	case EC_EMU8950:
+		info->chip = OPL_new(clock & 0x7FFFFFFF, rate);
+		OPL_setChipType(info->chip, 2);
+		break;		
 #endif
 	case EC_DBOPL:
 		info->chip = adlib_OPL2_init(clock & 0x7FFFFFFF, rate, _stream_update, info);
@@ -194,6 +222,9 @@ void device_stop_ym3812(UINT8 ChipID)
 	case EC_MAME:
 		ym3812_shutdown(info->chip);
 		break;
+  case EC_EMU8950:
+		OPL_delete(info->chip);
+		break;
 #endif
 	case EC_DBOPL:
 		adlib_OPL2_stop(info->chip);
@@ -211,6 +242,9 @@ void device_reset_ym3812(UINT8 ChipID)
 #ifdef ENABLE_ALL_CORES
 	case EC_MAME:
 		ym3812_reset_chip(info->chip);
+		break;
+  case EC_EMU8950:
+		OPL_reset(info->chip);
 		break;
 #endif
 	case EC_DBOPL:
@@ -230,6 +264,9 @@ UINT8 ym3812_r(UINT8 ChipID, offs_t offset)
 #ifdef ENABLE_ALL_CORES
 	case EC_MAME:
 		return ym3812_read(info->chip, offset & 1);
+	case EC_EMU8950:
+		OPL_writeIO(info->chip, 0, offset);
+		return OPL_readIO(info->chip);	
 #endif
 	case EC_DBOPL:
 		return adlib_OPL2_reg_read(info->chip, offset & 0x01);
@@ -248,6 +285,9 @@ void ym3812_w(UINT8 ChipID, offs_t offset, UINT8 data)
 #ifdef ENABLE_ALL_CORES
 	case EC_MAME:
 		ym3812_write(info->chip, offset & 1, data);
+		break;
+	case EC_EMU8950:
+		OPL_writeIO(info->chip, offset & 1, data);
 		break;
 #endif
 	case EC_DBOPL:
@@ -281,13 +321,57 @@ void ym3812_write_port_w(UINT8 ChipID, offs_t offset, UINT8 data)
 void ym3812_set_emu_core(UINT8 Emulator)
 {
 #ifdef ENABLE_ALL_CORES
-	EMU_CORE = (Emulator < 0x02) ? Emulator : 0x00;
+	EMU_CORE = (Emulator < 0x03) ? Emulator : 0x00;
 #else
 	EMU_CORE = EC_DBOPL;
 #endif
 	
 	return;
 }
+
+#ifdef ENABLE_ALL_CORES
+static void _emu8950_set_mute_mask(OPL *opl, UINT32 MuteMask)
+{
+	unsigned char CurChn;
+	UINT32 ChnMsk;
+
+	for (CurChn = 0; CurChn < 14; CurChn++)
+	{
+		if (CurChn < 9)
+		{
+			ChnMsk = OPL_MASK_CH(CurChn);
+		}
+		else
+		{
+			switch (CurChn)
+			{
+			case 9:
+				ChnMsk = OPL_MASK_BD;
+				break;
+			case 10:
+				ChnMsk = OPL_MASK_SD;
+				break;
+			case 11:
+				ChnMsk = OPL_MASK_TOM;
+				break;
+			case 12:
+				ChnMsk = OPL_MASK_CYM;
+				break;
+			case 13:
+				ChnMsk = OPL_MASK_HH;
+				break;
+			default:
+				ChnMsk = 0;
+				break;
+			}
+		}
+		if ((MuteMask >> CurChn) & 0x01)
+			opl->mask |= ChnMsk;
+		else
+			opl->mask &= ~ChnMsk;
+	}
+}
+#endif
 
 void ym3812_set_mute_mask(UINT8 ChipID, UINT32 MuteMask)
 {
@@ -297,6 +381,9 @@ void ym3812_set_mute_mask(UINT8 ChipID, UINT32 MuteMask)
 #ifdef ENABLE_ALL_CORES
 	case EC_MAME:
 		opl_set_mute_mask(info->chip, MuteMask);
+		break;
+	case EC_EMU8950:
+		_emu8950_set_mute_mask(info->chip, MuteMask);
 		break;
 #endif
 	case EC_DBOPL:

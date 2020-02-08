@@ -224,7 +224,7 @@ int device_start_ym2413(UINT8 ChipID, int clock)
 		if (info->chip == NULL)
 			return 0;
 		
-		OPLL_setChipMode(info->chip, info->Mode);
+		OPLL_setChipType(info->chip, info->Mode);
 		if (info->Mode)
 			OPLL_setPatch(info->chip, vrc7_inst);
 		break;

@@ -99,7 +99,6 @@ typedef struct __OPL {
   uint8_t test_flag;
   uint32_t slot_key_status;
   uint8_t rhythm_mode;
-  uint8_t in_rhythm[9];
 
   uint32_t eg_counter;
 
@@ -110,8 +109,7 @@ typedef struct __OPL {
   int32_t am_dphase;
   uint8_t lfo_am;
 
-  uint32_t noise_seed;
-  uint8_t noise;
+  uint32_t noise;
   uint8_t short_noise;
 
   OPL_SLOT slot[18];

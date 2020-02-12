@@ -1,5 +1,5 @@
 /**
- * emu8950 v1.0.0
+ * emu8950 v1.0.1
  * https://github.com/digital-sound-antiques/emu8950
  * Copyright (C) 2001-2020 Mitsutaka Okazaki
  */
@@ -179,9 +179,6 @@ static int32_t rks_table[8 * 2][2];
 /* resolution of sinc(x) table. sinc(x) where 0.0<=x<1.0 corresponds to sinc_table[0...SINC_RESO-1] */
 #define SINC_RESO 256
 #define SINC_AMP_BITS 12
-
-/* fast conversion: 3-point average filter is used instead of sinc(x) table. rough and fast.*/
-#define USE_FAST_RATE_CONV 0
 
 // double hamming(double x) { return 0.54 - 0.46 * cos(2 * PI * x); }
 static double blackman(double x) { return 0.42 - 0.5 * cos(2 * _PI_ * x) + 0.08 * cos(4 * _PI_ * x); }
@@ -594,68 +591,24 @@ static INLINE void set_block(OPL *opl, int ch, int blk) {
 
 static INLINE void update_rhythm_mode(OPL *opl) {
   const uint8_t new_rhythm_mode = (opl->reg[0xbd] >> 5) & 1;
-  const uint32_t slot_key_status = opl->slot_key_status;
 
-  if (opl->in_rhythm[6]) {
-    if (!(BIT(slot_key_status, SLOT_BD2) | new_rhythm_mode)) {
-      opl->in_rhythm[6] = 0;
-      opl->slot[SLOT_BD1].eg_state = RELEASE;
-      opl->slot[SLOT_BD1].eg_out = EG_MUTE;
-      opl->slot[SLOT_BD2].eg_state = RELEASE;
-      opl->slot[SLOT_BD2].eg_out = EG_MUTE;
-    }
-  } else if (new_rhythm_mode) {
-    opl->in_rhythm[6] = 1;
-    opl->slot[SLOT_BD1].eg_state = RELEASE;
-    opl->slot[SLOT_BD1].eg_out = EG_MUTE;
-    opl->slot[SLOT_BD2].eg_state = RELEASE;
-    opl->slot[SLOT_BD2].eg_out = EG_MUTE;
-  }
-
-  if (opl->in_rhythm[7]) {
-    if (!((BIT(slot_key_status, SLOT_HH) && BIT(slot_key_status, SLOT_SD)) | new_rhythm_mode)) {
-      opl->in_rhythm[7] = 0;
+  if (opl->rhythm_mode != new_rhythm_mode) {
+    if (new_rhythm_mode) {
+      opl->slot[SLOT_HH].type = 3;
+      opl->slot[SLOT_HH].pg_keep = 1;
+      opl->slot[SLOT_SD].type = 3;
+      opl->slot[SLOT_TOM].type = 3;
+      opl->slot[SLOT_CYM].type = 3;
+      opl->slot[SLOT_CYM].pg_keep = 1;
+    } else {
       opl->slot[SLOT_HH].type = 0;
       opl->slot[SLOT_HH].pg_keep = 0;
-      opl->slot[SLOT_HH].eg_state = RELEASE;
-      opl->slot[SLOT_HH].eg_out = EG_MUTE;
       opl->slot[SLOT_SD].type = 1;
-      opl->slot[SLOT_SD].eg_state = RELEASE;
-      opl->slot[SLOT_SD].eg_out = EG_MUTE;
-    }
-  } else if (new_rhythm_mode) {
-    opl->in_rhythm[7] = 1;
-    opl->slot[SLOT_HH].type = 3;
-    opl->slot[SLOT_HH].pg_keep = 1;
-    opl->slot[SLOT_HH].eg_state = RELEASE;
-    opl->slot[SLOT_HH].eg_out = EG_MUTE;
-    opl->slot[SLOT_SD].type = 3;
-    opl->slot[SLOT_SD].eg_state = RELEASE;
-    opl->slot[SLOT_SD].eg_out = EG_MUTE;
-  }
-
-  if (opl->in_rhythm[8]) {
-    if (!((BIT(slot_key_status, SLOT_CYM) && BIT(slot_key_status, SLOT_TOM)) | new_rhythm_mode)) {
-      opl->in_rhythm[8] = 0;
       opl->slot[SLOT_TOM].type = 0;
-      opl->slot[SLOT_TOM].eg_state = RELEASE;
-      opl->slot[SLOT_TOM].eg_out = EG_MUTE;
       opl->slot[SLOT_CYM].type = 1;
       opl->slot[SLOT_CYM].pg_keep = 0;
-      opl->slot[SLOT_CYM].eg_state = RELEASE;
-      opl->slot[SLOT_CYM].eg_out = EG_MUTE;
     }
-  } else if (new_rhythm_mode) {
-    opl->in_rhythm[8] = 1;
-    opl->slot[SLOT_TOM].type = 3;
-    opl->slot[SLOT_TOM].eg_state = RELEASE;
-    opl->slot[SLOT_TOM].eg_out = EG_MUTE;
-    opl->slot[SLOT_CYM].type = 3;
-    opl->slot[SLOT_CYM].pg_keep = 1;
-    opl->slot[SLOT_CYM].eg_state = RELEASE;
-    opl->slot[SLOT_CYM].eg_out = EG_MUTE;
   }
-
   opl->rhythm_mode = new_rhythm_mode;
 }
 
@@ -672,11 +625,14 @@ static void update_ampm(OPL *opl) {
   opl->lfo_am = am_table[(opl->am_phase >> 6) % sizeof(am_table)] >> (opl->am_mode ? 0 : 2);
 }
 
-static void update_noise(OPL *opl) {
-  if (opl->noise_seed & 1)
-    opl->noise_seed ^= 0x8003020;
-  opl->noise_seed >>= 1;
-  opl->noise = opl->noise_seed & 1;
+static void update_noise(OPL *opl, int cycle) {
+  int i;
+  for (i = 0; i < cycle; i++) {
+    if (opl->noise & 1) {
+      opl->noise ^= 0x800200;
+    }
+    opl->noise >>= 1;
+  }
 }
 
 static void update_short_noise(OPL *opl) {
@@ -850,9 +806,9 @@ static INLINE int16_t calc_slot_snare(OPL *opl) {
   uint32_t phase;
 
   if (BIT(opl->slot[SLOT_HH].pg_out, PG_BITS - 2))
-    phase = opl->noise ? _PD(0x300) : _PD(0x200);
+    phase = (opl->noise & 1) ? _PD(0x300) : _PD(0x200);
   else
-    phase = opl->noise ? _PD(0x0) : _PD(0x100);
+    phase = (opl->noise & 1) ? _PD(0x0) : _PD(0x100);
 
   return to_linear(slot->wave_table[phase], slot, 0);
 }
@@ -871,9 +827,9 @@ static INLINE int16_t calc_slot_hat(OPL *opl) {
   uint32_t phase;
 
   if (opl->short_noise)
-    phase = opl->noise ? _PD(0x2d0) : _PD(0x234);
+    phase = (opl->noise & 1) ? _PD(0x2d0) : _PD(0x234);
   else
-    phase = opl->noise ? _PD(0x34) : _PD(0xd0);
+    phase = (opl->noise & 1) ? _PD(0x34) : _PD(0xd0);
 
   return to_linear(slot->wave_table[phase], slot, 0);
 }
@@ -893,7 +849,6 @@ static void update_output(OPL *opl) {
   int i;
 
   update_ampm(opl);
-  update_noise(opl);
   update_short_noise(opl);
   update_slots(opl);
 
@@ -907,7 +862,7 @@ static void update_output(OPL *opl) {
   }
 
   /* CH7 */
-  if (!opl->in_rhythm[6]) {
+  if (!opl->rhythm_mode) {
     if (!(opl->mask & OPL_MASK_CH(6))) {
       out[6] = _MO(calc_fm(opl, 6));
     }
@@ -916,9 +871,10 @@ static void update_output(OPL *opl) {
       out[9] = _RO(calc_fm(opl, 6));
     }
   }
+  update_noise(opl, 14);
 
   /* CH8 */
-  if (!opl->in_rhythm[7]) {
+  if (!opl->rhythm_mode) {
     if (!(opl->mask & OPL_MASK_CH(7))) {
       out[7] = _MO(calc_fm(opl, 7));
     }
@@ -930,9 +886,10 @@ static void update_output(OPL *opl) {
       out[11] = _RO(calc_slot_snare(opl));
     }
   }
+  update_noise(opl, 2);
 
   /* CH9 */
-  if (!opl->in_rhythm[8]) {
+  if (!opl->rhythm_mode) {
     if (!(opl->mask & OPL_MASK_CH(8))) {
       out[8] = _MO(calc_fm(opl, 8));
     }
@@ -944,6 +901,7 @@ static void update_output(OPL *opl) {
       out[13] = _RO(calc_slot_cym(opl));
     }
   }
+  update_noise(opl, 2);
 
   /* ADPCM */
   if (opl->adpcm != NULL && !(opl->mask & OPL_MASK_ADPCM)) {
@@ -1071,7 +1029,7 @@ void OPL_reset(OPL *opl) {
   opl->pm_phase = 0;
   opl->am_phase = 0;
 
-  opl->noise_seed = 0xffff;
+  opl->noise = 1;
   opl->mask = 0;
 
   opl->rhythm_mode = 0;
@@ -1085,7 +1043,6 @@ void OPL_reset(OPL *opl) {
   }
 
   for (i = 0; i < 9; i++) {
-    opl->in_rhythm[i] = 0;
     opl->ch_alg[i] = 0;
   }
 
@@ -1257,8 +1214,6 @@ void OPL_writeReg(OPL *opl, uint32_t reg, uint8_t data) {
     set_fnumber(opl, c, ((data & 3) << 8) + opl->reg[reg - 0x10]);
     set_block(opl, c, (data >> 2) & 7);
     update_key_status(opl);
-    /* update rhythm mode here because key-off of rhythm instrument is deferred until key-on bit is down. */
-    update_rhythm_mode(opl);
 
   } else if (0xc0 <= reg && reg < 0xc9) {
 

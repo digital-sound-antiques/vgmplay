@@ -15,7 +15,6 @@
 #endif
 #include "emu2413.h"
 #include "2413intf.h"
-#include "panning.h"
 
 #ifdef ENABLE_ALL_CORES
 #define EC_NUKED	0x02	// Nuked OPLL
@@ -80,15 +79,6 @@ static void _emu2413_calc_stereo(OPLL *opll, INT32 **out, int samples)
 		bufL[i] = buffers[0];
 		bufR[i] = buffers[1];
 	}
-}
-
-static INT8 _emu2413_make_pan(INT16 pan) {
-	if (pan<0)
-		return 2;
-	else if (pan>0)
-		return 1;
-	else
-		return 3;
 }
 
 static void _emu2413_set_mute_mask(OPLL *opll, UINT32 MuteMask)
@@ -224,7 +214,7 @@ int device_start_ym2413(UINT8 ChipID, int clock)
 		if (info->chip == NULL)
 			return 0;
 		
-		OPLL_setChipType(info->chip, info->Mode);
+		OPLL_setChipMode(info->chip, info->Mode);
 		if (info->Mode)
 			OPLL_setPatch(info->chip, vrc7_inst);
 		break;
@@ -377,23 +367,26 @@ void ym2413_set_panning(UINT8 ChipID, INT16* PanVals)
 	ym2413_state *info = &YM2413Data[ChipID];
 	UINT8 CurChn;
 	UINT8 EmuChn;
-	float pan[2];
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
 	case EC_MAME:
 		break;
+	case EC_NUKED:
+		break;
 #endif
 	case EC_EMU2413:
-		for (CurChn = 0x00; CurChn < 0x0E; CurChn ++) {
-			calc_panning(pan, PanVals[CurChn]);
+		for (CurChn = 0x00; CurChn < 0x0E; CurChn ++)
+		{
+			// input:  0..8, BD, SD, TOM, CYM, HH
+			// output: 0..8, BD, HH, SD, TOM, CYM
 			if (CurChn < 10)
 				EmuChn = CurChn;
 			else if (CurChn < 13)
 				EmuChn = CurChn + 1;
 			else
 				EmuChn = 10;
-			OPLL_setPanFine(info->chip, EmuChn, pan);
+			OPLL_setPanEx(info->chip, EmuChn, PanVals[CurChn]);
 		}
 		break;
 	}

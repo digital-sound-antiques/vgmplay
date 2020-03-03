@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "panning.h" // Maxim
 
 #ifndef INLINE
 #if defined(_MSC_VER)
@@ -1054,6 +1055,7 @@ INLINE static void mix_output_stereo(OPLL *opll) {
   int i;
   out[0] = out[1] = 0;
   for (i = 0; i < 14; i++) {
+    /* Maxim/Valley Bell: added stereo control (multiply each side by a float in opll->pan[ch][side]) */
     if (opll->pan[i] & 2)
       out[0] += (int16_t)(opll->ch_out[i] * opll->pan_fine[i][0]);
     if (opll->pan[i] & 1)
@@ -1161,7 +1163,7 @@ void OPLL_reset(OPLL *opll) {
 
   for (i = 0; i < 15; i++) {
     opll->pan[i] = 3;
-    opll->pan_fine[i][1] = opll->pan_fine[i][0] = 1.0f;
+    centre_panning(opll->pan_fine[i]);
   }
 
   for (i = 0; i < 14; i++) {
@@ -1375,6 +1377,10 @@ void OPLL_writeIO(OPLL *opll, uint32_t adr, uint8_t val) {
 }
 
 void OPLL_setPan(OPLL *opll, uint32_t ch, uint8_t pan) { opll->pan[ch & 15] = pan; }
+
+void OPLL_setPanEx(OPLL *opll, uint32_t ch, int16_t pan) {
+  calc_panning(opll->pan_fine[ch & 15], pan); // Maxim/Valley Bell
+}
 
 void OPLL_setPanFine(OPLL *opll, uint32_t ch, float pan[2]) {
   opll->pan_fine[ch & 15][0] = pan[0];

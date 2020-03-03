@@ -230,6 +230,9 @@ uint32_t OPLL_toggleMask(OPLL *, uint32_t mask);
 #define OPLL_patch2dump OPLL_patchToDump
 #define OPLL_setChipMode OPLL_setChipType
 
+/* for vgmplay */
+void OPLL_setPanEx(OPLL *opll, uint32_t ch, int16_t pan);
+
 #ifdef __cplusplus
 }
 #endif

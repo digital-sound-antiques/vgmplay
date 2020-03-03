@@ -17,13 +17,13 @@
  *      siliconpr0n.org(digshadow, John McMaster):
  *          VRC VII decap and die shot.
  *
- *  version: 0.9
+ *  version: 1.0
  */
 
 #ifndef OPLL_H
 #define OPLL_H
 
-#include <stdint.h>
+#include "emutypes.h"
 
 #define RSM_FRAC 10
 #define OPLL_WRITEBUF_SIZE 2048

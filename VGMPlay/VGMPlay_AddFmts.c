@@ -1,5 +1,5 @@
 // VGMPlay_AddFmts.c: C Source File for playback of additional non-VGM formats
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +11,7 @@
 //#include <windows.h>
 void __stdcall Sleep(unsigned int dwMilliseconds);
 #else
+#include <unistd.h>
 #define	Sleep(msec)		usleep(msec * 1000)
 #endif
 

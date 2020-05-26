@@ -2,9 +2,13 @@
 ## Visual Studio 6
 ##################
 
+.vs/
+
 # Build results
 [Dd]ebug/
+[Dd]ebug_Win32/
 [Rr]elease/
+[Rr]elease_Win32/
 *.exe
 *.dll
 
@@ -27,3 +31,6 @@
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+*.ipch
+*.db

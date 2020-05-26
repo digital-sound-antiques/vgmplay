@@ -1231,6 +1231,13 @@ static void ShowOptPanBoxes(UINT8 ChipID, UINT8 ChipSet)
 		CoreName[0x01] = "MAME";
 		CoreName[0x02] = "EMU8950 (" EMU8950_VERSION ")";;
 		break;
+	case 0x0A: // YM3526
+	case 0x0B: // Y8950
+		MultiCore = true;
+		MaxMultiCore = 2;
+		CoreName[0x00] = "MAME";
+		CoreName[0x01] = "EMU8950 (" EMU8950_VERSION ")";
+		break;
 	case 0x0C:	// YMF262
 		MultiCore = true;
 		CoreName[0x00] = "AdLibEmu";

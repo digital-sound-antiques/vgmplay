@@ -35,7 +35,7 @@
 #define EC_DBOPL	0x00	// DosBox OPL (AdLibEmu)
 #ifdef ENABLE_ALL_CORES
 #define EC_MAME		0x01	// YM3826 core from MAME
-#define EC_EMU8950 0x02
+#define EC_EMU8950	0x02
 #endif
 
 typedef struct _ym3812_state ym3812_state;

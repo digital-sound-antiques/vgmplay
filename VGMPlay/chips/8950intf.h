@@ -37,4 +37,6 @@ void y8950_write_port_w(UINT8 ChipID, offs_t offset, UINT8 data);
 
 void y8950_write_data_pcmrom(UINT8 ChipID, offs_t ROMSize, offs_t DataStart,
 							  offs_t DataLength, const UINT8* ROMData);
+
+void y8950_set_emu_core(UINT8 Emulator);
 void y8950_set_mute_mask(UINT8 ChipID, UINT32 MuteMask);

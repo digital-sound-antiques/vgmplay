@@ -30,4 +30,5 @@ UINT8 ym3526_read_port_r(UINT8 ChipID, offs_t offset);
 void ym3526_control_port_w(UINT8 ChipID, offs_t offset, UINT8 data);
 void ym3526_write_port_w(UINT8 ChipID, offs_t offset, UINT8 data);
 
+void ym3526_set_emu_core(UINT8 Emulator);
 void ym3526_set_mute_mask(UINT8 ChipID, UINT32 MuteMask);

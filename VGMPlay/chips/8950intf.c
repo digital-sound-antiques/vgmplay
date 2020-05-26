@@ -29,10 +29,10 @@
 #endif
 #include "emu8950.h"
 
-#define EC_EMU8950	0x00	// DosBox OPL (AdLibEmu)
 #ifdef ENABLE_ALL_CORES
-#define EC_MAME		0x01	// YM3826 core from MAME
+#define EC_EMU8950	0x01
 #endif
+#define EC_MAME		0x00	// YM3826 core from MAME
 
 typedef struct _y8950_state y8950_state;
 struct _y8950_state
@@ -148,12 +148,12 @@ void y8950_stream_update(UINT8 ChipID, stream_sample_t **outputs, int samples)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_update_one(info->chip, outputs, samples);
-		break;
-#endif
 	case EC_EMU8950:
 		_emu8950_calc_stereo(info->chip, outputs, samples);
+		break;
+#endif
+	case EC_MAME:
+		y8950_update_one(info->chip, outputs, samples);
 		break;
 	}
 }
@@ -166,12 +166,12 @@ static void _stream_update(void *param/*, int interval*/)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_update_one(info->chip, DUMMYBUF, 0);
-		break;
-#endif
 	case EC_EMU8950:
 		_emu8950_calc_stereo(info->chip, DUMMYBUF, 0);
+		break;
+#endif
+	case EC_MAME:
+		y8950_update_one(info->chip, DUMMYBUF, 0);
 		break;
 	}
 }
@@ -200,8 +200,13 @@ int device_start_y8950(UINT8 ChipID, int clock)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
+	case EC_EMU8950:
+		info->chip = OPL_new(clock, rate);
+		OPL_setChipType(info->chip, 0);
+		break;
+#endif
 	case EC_MAME:
-		info->chip = y8950_init(clock,rate);
+		info->chip = y8950_init(clock, rate);
 		//assert_always(info->chip != NULL, "Error creating Y8950 chip");
 
 		/* ADPCM ROM data */
@@ -215,17 +220,12 @@ int device_start_y8950(UINT8 ChipID, int clock)
 		y8950_set_keyboard_handler(info->chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, info);
 
 		/* Y8950 setup */
-		y8950_set_timer_handler (info->chip, TimerHandler, info);
-		y8950_set_irq_handler   (info->chip, IRQHandler, info);
+		y8950_set_timer_handler(info->chip, TimerHandler, info);
+		y8950_set_irq_handler(info->chip, IRQHandler, info);
 		y8950_set_update_handler(info->chip, _stream_update, info);
 
 		//info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
 		//info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
-		break;
-#endif
-	case EC_EMU8950:
-		info->chip = OPL_new(clock,rate);
-		OPL_setChipType(info->chip,0);
 		break;
 	}
 	
@@ -240,12 +240,12 @@ void device_stop_y8950(UINT8 ChipID)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_shutdown(info->chip);
-		break;
-#endif
 	case EC_EMU8950:
 		OPL_delete(info->chip);
+		break;
+#endif
+	case EC_MAME:
+		y8950_shutdown(info->chip);
 		break;
 	}
 }
@@ -258,12 +258,12 @@ void device_reset_y8950(UINT8 ChipID)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_reset_chip(info->chip);
-		break;
-#endif
 	case EC_EMU8950:
 		OPL_reset(info->chip);
+		break;
+#endif
+	case EC_MAME:
+		y8950_reset_chip(info->chip);
 		break;
 	}
 }
@@ -273,16 +273,16 @@ void device_reset_y8950(UINT8 ChipID)
 UINT8 y8950_r(UINT8 ChipID, offs_t offset)
 {
 	//y8950_state *info = get_safe_token(device);
-	y8950_state *info = &Y8950Data[ChipID];
-	switch(EMU_CORE)
+	y8950_state* info = &Y8950Data[ChipID];
+	switch (EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		return y8950_read(info->chip, offset & 1);
-#endif
 	case EC_EMU8950:
 		OPL_writeIO(info->chip, 0, offset);
-		return OPL_readIO(info->chip);	
+		return OPL_readIO(info->chip);
+#endif
+	case EC_MAME:
+		return y8950_read(info->chip, offset & 1);
 	default:
 		return 0x00;
 	}
@@ -296,12 +296,12 @@ void y8950_w(UINT8 ChipID, offs_t offset, UINT8 data)
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_write(info->chip, offset & 1, data);
-		break;
-#endif
 	case EC_EMU8950:
 		OPL_writeIO(info->chip, offset & 1, data);
+		break;
+#endif
+	case EC_MAME:
+		y8950_write(info->chip, offset & 1, data);
 		break;
 	}
 }
@@ -336,25 +336,14 @@ void y8950_write_data_pcmrom(UINT8 ChipID, offs_t ROMSize, offs_t DataStart,
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		y8950_write_pcmrom(info->chip, ROMSize, DataStart, DataLength, ROMData);
-		break;
-#endif
 	case EC_EMU8950:
 		OPL_writeADPCMData(info->chip, 1, DataStart, DataLength, ROMData);
 		break;
-	}
-	return;
-}
-
-void y8950_set_emu_core(UINT8 Emulator)
-{
-#ifdef ENABLE_ALL_CORES
-	EMU_CORE = (Emulator < 0x02) ? Emulator : 0x00;
-#else
-	EMU_CORE = EC_EMU8950;
 #endif
-
+	case EC_MAME:
+		y8950_write_pcmrom(info->chip, ROMSize, DataStart, DataLength, ROMData);
+		break;
+	}
 	return;
 }
 
@@ -400,18 +389,29 @@ static void _emu8950_set_mute_mask(OPL *opl, UINT32 MuteMask)
 	}
 }
 
+void ym8950_set_emu_core(UINT8 Emulator)
+{
+#ifdef ENABLE_ALL_CORES
+	EMU_CORE = (Emulator < 0x02) ? Emulator : 0x00;
+#else
+	EMU_CORE = EC_MAME;
+#endif
+
+	return;
+}
+
 void y8950_set_mute_mask(UINT8 ChipID, UINT32 MuteMask)
 {
 	y8950_state *info = &Y8950Data[ChipID];
 	switch(EMU_CORE)
 	{
 #ifdef ENABLE_ALL_CORES
-	case EC_MAME:
-		opl_set_mute_mask(info->chip, MuteMask);
-		break;
-#endif
 	case EC_EMU8950:
 		_emu8950_set_mute_mask(info->chip, MuteMask);
+		break;
+#endif
+	case EC_MAME:
+		opl_set_mute_mask(info->chip, MuteMask);
 		break;
 	}
 }

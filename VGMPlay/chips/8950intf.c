@@ -389,7 +389,7 @@ static void _emu8950_set_mute_mask(OPL *opl, UINT32 MuteMask)
 	}
 }
 
-void ym8950_set_emu_core(UINT8 Emulator)
+void y8950_set_emu_core(UINT8 Emulator)
 {
 #ifdef ENABLE_ALL_CORES
 	EMU_CORE = (Emulator < 0x02) ? Emulator : 0x00;

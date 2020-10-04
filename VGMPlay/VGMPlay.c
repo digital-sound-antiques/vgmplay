@@ -2944,7 +2944,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		if (VGMHead.lngHzY8950)
 		{
 			//ChipVol = UseFM ? 0x00 : 0x100;
-			ym8950_set_emu_core(ChipOpts[0x00].Y8950.EmuCore);
+			y8950_set_emu_core(ChipOpts[0x00].Y8950.EmuCore);
 			ChipCnt = (VGMHead.lngHzY8950 & 0x40000000) ? 0x02 : 0x01;
 			for (CurChip = 0x00; CurChip < ChipCnt; CurChip ++)
 			{
